@@ -1962,7 +1962,7 @@ def calc_dqe(filein, file_err=None, fileout='senscuve.fits',standards_dir="/User
 
     if mode != "TDS":
         bad_lambda = [3930, 3960, 4130, 4340, 4680, 4861, 5420, 5740, 5770, 6300, 6562,
-                  6860, 6900, 6950, 7210, 7650, 7600,
+                  6860, 6900, 6950,  7650, 7600,#7210,
                   7650, 7700, 7750]
     else:
         bad_lambda = [3960,4130, 4340, 4861, 5420, 6562,
@@ -2022,7 +2022,7 @@ def calc_dqe(filein, file_err=None, fileout='senscuve.fits',standards_dir="/User
     plt.plot(wlscale[mask == True], np.ma.filled(dqe_all * 100, fill_value=np.nan)[mask == True], '.', color='gray',
              markersize=0.7)
     plt.xlim(wlscale[0],wlscale[-1])
-    plt.ylim(0,np.max(dqe_smo*100.)*1.1)
+    plt.ylim(0,np.nanmax(dqe_smo*100.)*1.1)
     plt.title("DQE derived with star {}".format(star_name))
     plt.ylabel(r"DQE, %")
     plt.xlabel(r"$\lambda, \AA$")

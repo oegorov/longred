@@ -946,16 +946,17 @@ def do_Reduction():
                         cur_default_disperser=None
                     if len(cur_default_bin) == 0:
                         cur_default_bin = None
-                    if cur_binning == cur_default_bin and cur_disperser == cur_default_disperser:
+                    if cur_binning == cur_default_bin[0] and cur_disperser == cur_default_disperser[0]:
                         cur_default_flat=default_flat.get()
                         cur_default_flat_err = "{}_err.fits".format(re.findall(r"(\S+).fits", default_flat.get())[0])
-                        if not os.path.isfile(w_dir,cur_default_flat_err):
+                        if not os.path.isfile(os.path.join(w_dir,cur_default_flat_err)):
                             cur_default_flat_err=None
                     else:
                         cur_default_flat = None
                         cur_default_flat_err = None
-                cur_default_flat=None
-                cur_default_flat_err = None
+                else:
+                    cur_default_flat=None
+                    cur_default_flat_err = None
                 for cur_slit in slits:
                     if cur_default_flat is not None and default_flat_force.get():
                         file_normflat=[cur_default_flat]
@@ -1022,11 +1023,12 @@ def do_Reduction():
                         cur_default_disperser=None
                     if len(cur_default_bin) == 0:
                         cur_default_bin = None
-                    if cur_binning == cur_default_bin and cur_disperser == cur_default_disperser:
+                    if cur_binning == cur_default_bin[0] and cur_disperser == cur_default_disperser[0]:
                         cur_default_transform=default_transform.get()
                     else:
                         cur_default_transform = None
-                cur_default_transform=None
+                else:
+                    cur_default_transform=None
                 for cur_slit in slits:
                     for cur_type in seek_types:
                         do_shift_x = False
@@ -1041,7 +1043,7 @@ def do_Reduction():
                         if len(file_transform)==0 and cur_default_transform is None:
                             file_transform=[None]
                         elif len(file_transform)==0:
-                            filein_transform=[cur_default_transform]
+                            file_transform=[cur_default_transform]
                         if cur_type != 'sunsky':
                             if (cur_type == 'obj' and atmdisp_findshift_x_obj_val.get()) or \
                                     (cur_type == 'star' and atmdisp_findshift_x_star_val.get()):
@@ -1079,7 +1081,7 @@ def do_Reduction():
                                                              binning=cur_binning, state_in='normalized',
                                                              w_dir=w_dir, process_unc=False, process_numbers=True)
 
-                        if len(filein) > 0:
+                        if len(filein) > 0 and file_transform[0] is not None:
                             if atm_disp_out is not None:
                                 if os.path.isfile(os.path.join(w_dir,atm_disp_out)):
                                     os.remove(os.path.join(w_dir,atm_disp_out))
@@ -1102,7 +1104,9 @@ def do_Reduction():
                                 do_update_RedSummary(add=[shift_out, atm_disp_out, save_test])
                             else:
                                 message("Something went wrong with calculation of relative shifts and atmospheric dispersion")
-
+                        else:
+                            message("Cannot proceed atm.disp and shifts correction of {} for slit {}, binning {} and disperser {}".format(
+                                cur_type,cur_slit,cur_binning,cur_disperser))
                         # elif len(filein) == 1:
                         #     ascii.write([filenum[0], 0, 0], os.path.join(w_dir,shift_out),
                         #                 names=['filenum', 'dx', 'dy'], overwrite=True)
@@ -1124,11 +1128,12 @@ def do_Reduction():
                         cur_default_disperser=None
                     if len(cur_default_bin) == 0:
                         cur_default_bin = None
-                    if cur_binning == cur_default_bin and cur_disperser == cur_default_disperser:
+                    if cur_binning == cur_default_bin[0] and cur_disperser == cur_default_disperser[0]:
                         cur_default_transform=default_transform.get()
                     else:
                         cur_default_transform = None
-                cur_default_transform=None
+                else:
+                    cur_default_transform=None
                 for cur_slit in slits:
                     if default_transform_force.get() and cur_default_transform is not None:
                         filein_transform=[cur_default_transform]
@@ -1189,11 +1194,12 @@ def do_Reduction():
                         cur_default_disperser=None
                     if len(cur_default_bin) == 0:
                         cur_default_bin = None
-                    if cur_binning == cur_default_bin and cur_disperser == cur_default_disperser:
+                    if cur_binning == cur_default_bin[0] and cur_disperser == cur_default_disperser[0]:
                         cur_default_transform=default_transform.get()
                     else:
                         cur_default_transform = None
-                cur_default_transform=None
+                else:
+                    cur_default_transform=None
                 if os.path.isfile(os.path.join(w_dir,default_disp_curve.get())):
                     cur_default_disperser=re.findall(r"\S+_s\d?\.?\d?_([\w@]+)_\d+x\d+",default_disp_curve.get())
                     cur_default_bin = re.findall(r"\S+_s\d?\.?\d?_[\w@]+_(\d+x\d+)", default_disp_curve.get())
@@ -1201,11 +1207,12 @@ def do_Reduction():
                         cur_default_disperser=None
                     if len(cur_default_bin) == 0:
                         cur_default_bin = None
-                    if cur_binning == cur_default_bin and cur_disperser == cur_default_disperser:
+                    if cur_binning == cur_default_bin[0] and cur_disperser == cur_default_disperser[0]:
                         cur_default_disp_curve=default_disp_curve.get()
                     else:
                         cur_default_disp_curve = None
-                cur_default_disp_curve=None
+                else:
+                    cur_default_disp_curve=None
                 for cur_slit in slits:
                     if default_transform_force.get() and cur_default_transform is not None:
                         filein_transform=[cur_default_transform]
@@ -1299,8 +1306,8 @@ def do_Reduction():
                     #if len(cur_default_type)>0 and cur_default_type==cur_type:
                     cur_default_disperser=re.findall(r"\S+_s\d?\.?\d?_([\w@]+)_\d+x\d+",default_transform.get())
                     cur_default_bin = re.findall(r"\S+_s\d?\.?\d?_[\w@]+_(\d+x\d+)", default_transform.get())
-                    if len(cur_default_disperser)>0 and cur_disperser == cur_default_disperser and \
-                        len(cur_default_bin) > 0 and cur_binning == cur_default_bin:
+                    if len(cur_default_disperser)>0 and cur_disperser == cur_default_disperser[0] and \
+                        len(cur_default_bin) > 0 and cur_binning == cur_default_bin[0]:
                             cur_default_transform=default_transform.get()
                 for cur_type in seek_types:
                     for cur_slit in slits:
@@ -1626,8 +1633,8 @@ def do_Reduction():
                 if os.path.isfile(os.path.join(w_dir, default_sens_curve.get())):
                     cur_default_disperser = re.findall(r"\S+_s\d?\.?\d?_([\w@]+)_\d+x\d+", default_sens_curve.get())
                     cur_default_bin = re.findall(r"\S+_s\d?\.?\d?_[\w@]+_(\d+x\d+)", default_sens_curve.get())
-                    if len(cur_default_disperser) > 0 and cur_disperser == cur_default_disperser and \
-                            len(cur_default_bin) > 0 and cur_binning == cur_default_bin:
+                    if len(cur_default_disperser) > 0 and cur_disperser == cur_default_disperser[0] and \
+                            len(cur_default_bin) > 0 and cur_binning == cur_default_bin[0]:
                         cur_default_senscurve = default_sens_curve.get()
                 for cur_slit in slits:
                     if default_sens_curve_force.get() and cur_default_senscurve is not None:
